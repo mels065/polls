@@ -1,14 +1,23 @@
-const { 
-    buildSchema, 
-    graphql,
-} = require("graphql");
+const graphql = require("graphql");
 const Joi = require("@hapi/joi");
 
 const User = require("../models/user");
 const Poll = require("../models/poll");
 const Answer = require("../models/answer");
 
-const authentication = require("./utils/authentication");
+const authenticationHandler = require("./utils/authentication");
+const registerHandler = require("./utils/register");
+const loginHandler = require("./utils/login");
+
+const {
+    GraphQLObjectType,
+    GraphQLSchema,
+    GraphQLString,
+    GraphQLID,
+    GraphQLBoolean,
+    GraphQLNonNull,
+    GraphQLList
+} = graphql;
 
 const UserType = new GraphQLObjectType({
     name: "User",
@@ -18,7 +27,7 @@ const UserType = new GraphQLObjectType({
         email: {
             type: GraphQLString,
             resolve(parent, args, context) {
-                return authentication((parent, args, context) => {
+                return authenticationHandler((parent, args, context) => {
                     return context.user.id === parent.id ? parent.email : null;
                 });
             }
@@ -72,10 +81,12 @@ const AnswerType = new GraphQLObjectType({
     })
 });
 
-const TokenType = new GraphQLObjectType({
+const ResponseType = new GraphQLObjectType({
     name: "Token",
     fields: () => ({
-        value: { type: GraphQLString },
+        success: { type: new GraphQLNonNull(GraphQLBoolean) },
+        message: { type: GraphQLString },
+        token: { type: GraphQLString },
     })
 });
 
@@ -125,54 +136,27 @@ const Mutation = new GraphQLObjectType({
             }
         },
         register: {
-            type: TokenType,
+            type: ResponseType,
             args: {
-                username: new GraphQLNonNull(GraphQLString),
-                email: new GraphQLNonNull(GraphQLString),
-                password: new GraphQLNonNull(GraphQLString),
-                repeatPassword: new GraphQLNonNull(GraphQLString),
+                username: { type: new GraphQLNonNull(GraphQLString) },
+                email: { type: new GraphQLNonNull(GraphQLString) },
+                password: { type: new GraphQLNonNull(GraphQLString) },
+                repeatPassword: { type: new GraphQLNonNull(GraphQLString) },
             },
             resolve(parent, args) {
-                const schema = Joi.object({
-                    username: Joi.string()
-                        .min(8)
-                        .max(30)
-                        .required(),
-                    email: Joi.string()
-                        .email()
-                        .required(),
-                    password: Joi.string()
-                        .pattern(/^[a-zA-Z0-9]{8,30}/)
-                        .required(),
-                    repeatPassword: Joi.string()
-                        .pattern(/^[a-zA-Z0-9]{8,30}/)
-                        .required(),
-                });
-                const { error } = schema.validate(args);
-                if (error) return { success: false, message: error.message };
-
-                
+                return registerHandler(args);
             },
         },
-        // login: {
-        //     type: TokenType,
-        //     args: {
-        //         email: new GraphQLNonNull(GraphQLString),
-        //         password: new GraphQLNonNull(GraphQLString),
-        //     },
-        //     resolve(parent, args) {
-        //         const schema = Joi.object({
-        //             email: Joi.string()
-        //                 .email()
-        //                 .required(),
-        //             password: Joi.string()
-        //                 .pattern(/^[a-zA-Z0-9]{8,30}/)
-        //                 .required()
-        //         });
-        //         const { error } = schema.validate(args);
-        //         if (error) return null;
-        //     }
-        // }
+        login: {
+            type: ResponseType,
+            args: {
+                email: { type: new GraphQLNonNull(GraphQLString) },
+                password: { type: new GraphQLNonNull(GraphQLString) },
+            },
+            resolve(parent, args) {
+                return loginHandler(args);
+            }
+        }
     }
 });
 

@@ -1,35 +1,24 @@
-const Joi = require("@hapi/joi");
-
 const User = require("../../models/user");
 
+const { validateRegister } = require("./validation");
+const createToken = require("./create-token");
+
 module.exports = async (args) => {
-    const schema = Joi.object({
-        username: Joi.string()
-            .min(8)
-            .max(30)
-            .required(),
-        email: Joi.string()
-            .email()
-            .required(),
-        password: Joi.string()
-            .pattern(/^[a-zA-Z0-9]{8,30}/)
-            .required(),
-        repeatPassword: Joi.string()
-            .pattern(/^[a-zA-Z0-9]{8,30}/)
-            .required(),
-    });
-    const { error } = schema.validate(args);
+    const error = validateRegister(args);
     if (error) return { success: false, message: error.message };
 
-    const emailExists = this.find({ email: args.email });
+    const emailExists = await User.findOne({ email: args.email });
     if (emailExists) return { success: false, message: "Email already exists" };
 
+    if (args.password !== args.repeatPassword) return { success: false, message: "Passwords do not match" };
+
     try {
-        const user = new this(args);
+        const user = new User(args);
         await user.save();
 
-        const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET);
-        return { success: true, token };
+        // const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET);
+        // return { success: true, token };
+        return createToken(user.id);
     } catch (err) {
         return { success: false, message: err.message }
     }
