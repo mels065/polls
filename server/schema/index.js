@@ -3,7 +3,7 @@ const Joi = require("@hapi/joi");
 
 const User = require("../models/user");
 const Poll = require("../models/poll");
-const Answer = require("../models/answer");
+const Vote = require("../models/vote");
 
 const authenticationHandler = require("./utils/authentication");
 const registerHandler = require("./utils/register");
@@ -15,6 +15,7 @@ const {
     GraphQLString,
     GraphQLID,
     GraphQLBoolean,
+    GraphQLInt,
     GraphQLNonNull,
     GraphQLList
 } = graphql;
@@ -26,23 +27,22 @@ const UserType = new GraphQLObjectType({
         username: { type: GraphQLString },
         email: {
             type: GraphQLString,
-            resolve(parent, args, context) {
-                return authenticationHandler((parent, args, context) => {
-                    return context.user.id === parent.id ? parent.email : null;
-                });
-            }
+            resolve: authenticationHandler((parent, args, context) =>  (
+                context.user.id === parent.id ? parent.email : null
+            )),
         },
         pollsCreated: {
-            type: PollType,
+            type: new GraphQLList(PollType),
             resolve(parent, args) {
                 return Poll.find({ creatorId: parent.id });
             }
 
         },
         pollsVoted: {
-            type: PollType,
-            resolve(parent, args) {
-                return Poll.find({ answers: { voters: { $in: [parent.id] } } });
+            type: new GraphQLList(PollType),
+            resolve: async (parent, args) => {
+                const votes = await Vote.find({userId: parent.id});
+                return Promise.all(votes.map(vote => Poll.findById(vote.pollId)));
             }
         }
     }),
@@ -62,7 +62,10 @@ const PollType = new GraphQLObjectType({
         answers: { 
             type: new GraphQLList(AnswerType),
             resolve(parent, args) {
-                return Answer.find({ pollId: parent.id })
+                return parent.answers.map((answer, i) => ({
+                    label: answer,
+                    votes: Vote.find({ pollId: parent.id, answerIndex: i }),
+                }));
             }
         }
     }),
@@ -72,17 +75,30 @@ const AnswerType = new GraphQLObjectType({
     name: "Answer",
     fields: () => ({
         label: { type: GraphQLString },
-        voters: {
-            type: new GraphQLList(UserType),
+        votes: { type: new GraphQLList(VoteType) }
+    })
+});
+
+const VoteType = new GraphQLObjectType({
+    name: "Vote",
+    fields: () => ({
+        user: {
+            type: UserType,
             resolve(parent, args) {
-                return parent.voters.map(id => User.findById(id));
+                return User.findById(parent.userId);
+            }
+        },
+        poll: {
+            type: PollType,
+            resolve(parent, args) {
+                return Poll.findById(parent.pollId);
             }
         }
     })
 });
 
 const ResponseType = new GraphQLObjectType({
-    name: "Token",
+    name: "Response",
     fields: () => ({
         success: { type: new GraphQLNonNull(GraphQLBoolean) },
         message: { type: GraphQLString },
@@ -99,6 +115,10 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args) {
                 return User.findById(args.id);
             }
+        },
+        currentUser: {
+            type: UserType,
+            resolve: authenticationHandler((parent, args, context) => context.user),
         },
         poll: {
             type: PollType,
@@ -119,22 +139,6 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
     name: "Mutation",
     fields: {
-        createPoll: {
-            type: PollType,
-            args: {
-                creatorId: { type: new GraphQLNonNull(GraphQLID) },
-                question: { type: new GraphQLNonNull(GraphQLString) },
-                answers: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) },
-            },
-            resolve(parent, args) {
-                let poll = new Poll({
-                    creatorId: args.creatorId,
-                    question: args.question,
-                    answers: args.answers.map(label => ({ label, voters: [] })),
-                });
-                return poll.save();
-            }
-        },
         register: {
             type: ResponseType,
             args: {
@@ -156,6 +160,56 @@ const Mutation = new GraphQLObjectType({
             resolve(parent, args) {
                 return loginHandler(args);
             }
+        },
+        deleteUser: {
+            type: UserType,
+            resolve: authenticationHandler(async (parent, args, context) => await context.user.remove())
+        },
+        createPoll: {
+            type: PollType,
+            args: {
+                question: { type: new GraphQLNonNull(GraphQLString) },
+                answers: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) }
+            },
+            resolve: authenticationHandler((parent, args, context) => {
+                const poll = new Poll({
+                    creatorId: context.user.id,
+                    question: args.question,
+                    answers: args.answers,
+                });
+                return poll.save();
+            })
+        },
+        deletePoll: {
+            type: PollType,
+            args: {
+                pollId: { type: new GraphQLNonNull(GraphQLID) }
+            },
+            resolve: authenticationHandler((parent, args, context) => (
+                Poll.findOneAndDelete({ _id: args.pollId, creatorId: context.user.id })
+            ))
+        },
+        castVote: {
+            type: VoteType,
+            args: {
+                pollId: { type: new GraphQLNonNull(GraphQLID) },
+                answerIndex: { type: new GraphQLNonNull(GraphQLInt) }
+            },
+            resolve: authenticationHandler(async (parent, args, context) => {
+                const poll = await Poll.findById(args.pollId);
+                return await poll.vote(context.user.id, args.answerIndex);
+            })
+        },
+        castUnvote: {
+            type: VoteType,
+            args: {
+                pollId: { type: new GraphQLNonNull(GraphQLID) },
+                answerIndex: { type: new GraphQLNonNull(GraphQLInt) }
+            },
+            resolve: authenticationHandler(async (parent, args, context) =>  {
+                const poll = await Poll.findById(args.pollId);
+                return await poll.unvote(context.user.id, args.answerIndex)
+            })
         }
     }
 });
