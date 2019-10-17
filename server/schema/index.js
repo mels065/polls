@@ -130,7 +130,7 @@ const RootQuery = new GraphQLObjectType({
         polls: {
             type: new GraphQLList(PollType),
             resolve(parent, args) {
-                return Poll.find({});
+                return Poll.find({}).sort("-createdOn");
             }
         }
     }

@@ -5,7 +5,8 @@ const Vote = require("./vote");
 const PollSchema = new Schema({
     creatorId: { type: Schema.Types.ObjectId, ref: "User" },
     question: { type: String, required: true },
-    answers: { type: [String] }
+    answers: { type: [String] },
+    createdOn: { type: Date, default: Date.now }
 });
 
 PollSchema.pre("remove", async function(next) {
