@@ -2,8 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
-import './index.css';
-import App from './App';
+import { BrowserRouter as Router } from "react-router-dom";
+import App from './components/App';
+
+import MainProvider from "./components/context";
 
 const client = new ApolloClient({
     uri: "/graphql",
@@ -19,7 +21,11 @@ const client = new ApolloClient({
 
 ReactDOM.render(
     <ApolloProvider client={client}>
-        <App />
+        <MainProvider>
+            <Router>
+                <App />
+            </Router>
+        </MainProvider>
     </ApolloProvider>,
     document.getElementById('root')
 );
