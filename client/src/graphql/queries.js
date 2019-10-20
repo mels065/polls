@@ -1,7 +1,7 @@
 import { gql } from "apollo-boost";
 
 export const getCurrentUser = gql`
-    query {
+    {
         currentUser {
             id
             username
@@ -12,12 +12,15 @@ export const getCurrentUser = gql`
 
 export const getUser = gql`
     query($id: ID!) {
-        user(id: $id)
+        user(id: $id) {
+            id
+            username
+        }
     }
 `;
 
 export const getPolls = gql`
-    query {
+    {
         polls {
             id
             creator {
@@ -28,8 +31,10 @@ export const getPolls = gql`
             answers {
                 label
                 votes {
-                    id
-                    username
+                    user {
+                        id
+                        username
+                    }
                 }
             }
         }
@@ -48,8 +53,10 @@ export const getPoll = gql`
             answers {
                 label
                 votes {
-                    id
-                    username
+                    user {
+                        id
+                        username
+                    }
                 }
             }
         }

@@ -1,7 +1,4 @@
 import React from "react";
-import { gql } from "react-apollo";
-
-import { getCurrentUser } from "../../graphql/queries";
 
 const value = {
     isLoading: false,
@@ -38,7 +35,6 @@ export function CurrentUserProvider({ children }) {
     return (
         <CurrentUserContext.Provider value={{
             ...user,
-            toggleLoading,
             registerUser,
             unregisterUser,
         }}>
