@@ -1,7 +1,7 @@
 import { gql } from "apollo-boost";
 
 export const getCurrentUser = gql`
-    {
+    query {
         currentUser {
             id
             username
@@ -17,7 +17,7 @@ export const getUser = gql`
 `;
 
 export const getPolls = gql`
-    {
+    query {
         polls {
             id
             creator {

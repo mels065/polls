@@ -2,7 +2,13 @@ import React from "react";
 
 const value = {
     isLoading: false,
-    polls: []
+    polls: [],
+    generatePolls(polls) {
+        this.polls = polls;
+    },
+    clearPolls() {
+        this.polls = [];
+    }
 };
 
 export const CurrentPollListContext = React.createContext(value);

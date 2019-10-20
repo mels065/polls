@@ -8,6 +8,8 @@ import { getCurrentUser } from "../../graphql/queries";
 
 import Layout from "../Layout";
 
+import Home from "../pages/Home";
+
 function App({ data }) {
   const context = React.useContext(CurrentUserContext);
   const { currentUser } = data;
@@ -25,7 +27,16 @@ function App({ data }) {
       <Layout>
         <Switch>
           <Route exact path="/">
-            Home
+            <Home />
+          </Route>
+          <Route exact path="/register">
+            Register
+          </Route>
+          <Route exact path="/login">
+            Login
+          </Route>
+          <Route exact path="/logout">
+            Logout
           </Route>
           <Route exact path="/profile">
             Profile
