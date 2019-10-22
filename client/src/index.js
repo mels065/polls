@@ -22,7 +22,7 @@ const client = new ApolloClient({
 ReactDOM.render(
     <ApolloProvider client={client}>
         <MainProvider>
-            <Router>
+            <Router forceRefresh={true}>
                 <App />
             </Router>
         </MainProvider>

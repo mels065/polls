@@ -9,18 +9,15 @@ import { getCurrentUser } from "../../graphql/queries";
 import Layout from "../Layout";
 
 import Home from "../pages/Home";
+import Register from "../pages/Register";
 
 function App({ data }) {
   const context = React.useContext(CurrentUserContext);
   const { currentUser } = data;
 
-  React.useEffect(() => {
-    if (currentUser) {
-      context.registerUser(currentUser);
-    } else {
-      context.unregisterUser();
-    }
-  }, [currentUser]);
+  if (currentUser) {
+    context.registerUser(currentUser);
+  }
 
   return (
     <div className="App">
@@ -30,7 +27,7 @@ function App({ data }) {
             <Home />
           </Route>
           <Route exact path="/register">
-            Register
+            <Register />
           </Route>
           <Route exact path="/login">
             Login
