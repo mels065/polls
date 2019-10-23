@@ -11,6 +11,7 @@ import Layout from "../Layout";
 import HomePage from "../pages/Home";
 import RegisterPage from "../pages/Register";
 import LoginPage from "../pages/Login"
+import Logout from "../pages/Logout";
 
 function App({ data }) {
   const context = React.useContext(CurrentUserContext);
@@ -34,7 +35,7 @@ function App({ data }) {
             <LoginPage />
           </Route>
           <Route exact path="/logout">
-            Logout
+            <Logout />
           </Route>
           <Route exact path="/profile">
             Profile
