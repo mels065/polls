@@ -4,10 +4,12 @@ import RegisterForm from "../../modules/RegisterForm";
 
 import "./style.scss";
 
-function Register() {
+function RegisterPage() {
     return (
-        <RegisterForm />
+        <div id="Register">
+            <RegisterForm />
+        </div>
     )
 }
 
-export default Register;
+export default RegisterPage;

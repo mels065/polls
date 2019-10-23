@@ -2,12 +2,12 @@ import React from "react";
 
 import PollList from "../../modules/PollList";
 
-function Home() {
+function HomePage() {
     return (
-        <main id="Home">
+        <div id="Home">
             <PollList />
-        </main>
+        </div>
     )
 }
 
-export default Home;
+export default HomePage;

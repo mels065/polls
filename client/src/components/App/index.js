@@ -8,8 +8,9 @@ import { getCurrentUser } from "../../graphql/queries";
 
 import Layout from "../Layout";
 
-import Home from "../pages/Home";
-import Register from "../pages/Register";
+import HomePage from "../pages/Home";
+import RegisterPage from "../pages/Register";
+import LoginPage from "../pages/Login"
 
 function App({ data }) {
   const context = React.useContext(CurrentUserContext);
@@ -24,13 +25,13 @@ function App({ data }) {
       <Layout>
         <Switch>
           <Route exact path="/">
-            <Home />
+            <HomePage />
           </Route>
           <Route exact path="/register">
-            <Register />
+            <RegisterPage />
           </Route>
           <Route exact path="/login">
-            Login
+            <LoginPage />
           </Route>
           <Route exact path="/logout">
             Logout

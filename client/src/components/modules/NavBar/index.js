@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { 
     faUser,
     faSignOutAlt,
@@ -17,9 +18,11 @@ function NavBar() {
 
     return (
         <nav className="navbar">
-            <div className="logo">
-                <h1>Polling</h1>
-            </div>
+            <Link to="/">
+                <div className="logo">
+                    <h1>Polling</h1>
+                </div>
+            </Link>
             <div className="menu-opts">
                 <ul>
                     {

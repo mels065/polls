@@ -5,13 +5,13 @@ import { useMutation } from "react-apollo";
 
 import Form from "../Form";
 
-import { register } from "../../../graphql/mutations";
+import { login } from "../../../graphql/mutations";
 
 import "./style.scss";
 
-function RegisterForm({ history }) {
+function LoginForm({ history }) {
     const [error, setError] = React.useState(null);
-    const [mutate] = useMutation(register);
+    const [mutate] = useMutation(login);
 
     function onSubmitCreator(formState) {
         return async (event) => {
@@ -23,7 +23,7 @@ function RegisterForm({ history }) {
                         { ...newVars, [_.camelCase(data.label)]: data.value }
                     ), {}),
                 });
-                const { register: {
+                const { login: {
                     success,
                     message,
                     token,
@@ -43,22 +43,20 @@ function RegisterForm({ history }) {
 
     return (
         <React.Fragment>
-            <h2>Register</h2>
+            <h2>Login</h2>
             <Form
                 error={error}
                 formShape={
                     [
                         { type: "email", label: "Email" },
-                        { type: "text", label: "Username" },
-                        { type: "password", label: "Password" },
-                        { type: "password", label: "Repeat Password" }
+                        { type: "password", label: "Password" }
                     ]
                 }
-                submitButtonLabel="Register"
+                submitButtonLabel="Login"
                 onSubmitCreator={onSubmitCreator}
             />
         </React.Fragment>
     )
 }
 
-export default withRouter(RegisterForm);
+export default withRouter(LoginForm);
