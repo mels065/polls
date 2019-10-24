@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import AnswerListItem from "../AnswerListItem";
 
@@ -12,9 +13,11 @@ function PollListItem({ poll: {
  } }) {
     return (
         <div className="poll-list-item">
-            <div className="poll-list-item-question">
-                {question}
-            </div>
+            <Link to={`/poll/${id}`}>
+                <h2 className="poll-list-item-question">
+                    {question}
+                </h2>
+            </Link>
             <ul className="poll-list-item-answers">
                 {answers.map((answer, i) => (
                 <li key={i}>

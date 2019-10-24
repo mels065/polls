@@ -29,6 +29,15 @@ export const deleteUser = gql`
     }
 `;
 
+export const updateUser = gql`
+    mutation($username: String) {
+        updateUser(username: $username) {
+            id
+            username
+        }
+    }
+`;
+
 export const createPoll = gql`
     mutation($question: String!, $answers: [String!]!) {
         createPoll(question: $question, answers: $answers) {

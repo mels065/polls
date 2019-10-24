@@ -1,5 +1,4 @@
 import React from 'react';
-import { graphql } from "react-apollo";
 import { Switch, Route, withRouter } from "react-router-dom";
 import './style.scss';
 
@@ -8,21 +7,18 @@ import { getCurrentUser } from "../../graphql/queries";
 
 import Layout from "../Layout";
 
+import FlashMessage from "../modules/FlashMessage";
+
 import HomePage from "../pages/Home";
 import RegisterPage from "../pages/Register";
 import LoginPage from "../pages/Login"
+import Profile from "../pages/Profile";
 import Logout from "../pages/Logout";
 
-function App({ data }) {
-  const context = React.useContext(CurrentUserContext);
-  const { currentUser } = data;
-
-  if (currentUser) {
-    context.registerUser(currentUser);
-  }
-
+function App() {
   return (
     <div className="App">
+      <FlashMessage />
       <Layout>
         <Switch>
           <Route exact path="/">
@@ -38,7 +34,7 @@ function App({ data }) {
             <Logout />
           </Route>
           <Route exact path="/profile">
-            Profile
+            <Profile />
           </Route>
           <Route exact path="/poll/:id">
             {(() => {
@@ -56,4 +52,4 @@ function App({ data }) {
   );
 }
 
-export default graphql(getCurrentUser)(App);
+export default App;

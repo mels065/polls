@@ -1,14 +1,47 @@
 import React from "react";
+import _ from "lodash";
+
+import { FlashMessageContext } from "../../context/FlashMessage";
 
 import "./style.scss";
 
-function Form({ error, formShape, submitButtonLabel, onSubmitCreator }) {
+function Form({
+    formShape,
+    mutate,
+    submitButtonLabel,
+    onSubmitCreatorCallback,
+    successMessage,
+}) {
     const [formState, changeFormState] = React.useState(
-        formShape.map(data => ({
-            ...data,
-            value: data.defaultValue ? data.defaultValue : "",
-        }))
+        formShape ?
+            formShape.map(data => ({
+                ...data,
+                value: data.defaultValue ? data.defaultValue : "",
+            })) :
+            []
     );
+    const flashMessageContext = React.useContext(FlashMessageContext);
+
+    function onSubmitCreator() {
+        return async (event) => {
+            event.preventDefault();
+
+            try {
+                const { data } = await mutate({
+                    variables: formState.reduce((newVars, data) => (
+                        { ...newVars, [_.camelCase(data.label)]: data.value }
+                    ), {}),
+                });
+                await onSubmitCreatorCallback(data);
+
+                if (successMessage)
+                    flashMessageContext.showFlash(successMessage, 2);
+                
+            } catch (err) {
+                flashMessageContext.showFlash(err.message, 1);
+            }
+        }
+    }
 
     function onChangeCreator(inputIndex) {
         return (event) => {
@@ -19,8 +52,7 @@ function Form({ error, formShape, submitButtonLabel, onSubmitCreator }) {
     }
 
     return (
-        <form className="form" onSubmit={onSubmitCreator(formState)}>
-            <div className="form-error">{error}</div>
+        <form className="form" onSubmit={onSubmitCreator()}>
             {formState.map((data, i) => (
                 <label key={i} className="form-group">
                     {data.label} <input

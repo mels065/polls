@@ -1,42 +1,33 @@
 import React from "react";
 
 const value = {
-    isLoading: false,
     userId: null,
     username: "",
     email: "",
-    registerUser() {},
-    unregisterUser() {}
+    registerUser() {}
 };
 
 export const CurrentUserContext = React.createContext(value);
 
 export function CurrentUserProvider({ children }) {
-    const [user, changeUser] = React.useState({
-        userId: null,
-        username: "",
-        email: ""
+    const [state, setState] = React.useState({
+        userId: value.userId,
+        username: value.username,
+        email: value.email,
     });
 
     function registerUser(user) {
-        if (user.userId && user.username && user.email) {
-            changeUser(user);
-        }
-    }
-
-    function unregisterUser() {
-        changeUser({
-            userId: null,
-            username: "",
-            email: "",
-        })
+        setState({
+            userId: user.id,
+            username: user.username,
+            email: user.email
+        });
     }
 
     return (
         <CurrentUserContext.Provider value={{
-            ...user,
-            registerUser,
-            unregisterUser,
+            ...state,
+            registerUser
         }}>
             {children}
         </CurrentUserContext.Provider>

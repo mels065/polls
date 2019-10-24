@@ -15,7 +15,7 @@ export const CurrentPollListContext = React.createContext(value);
 
 export function CurrentPollListProvider({ children }) {
     return (
-        <CurrentPollListContext.Provider>
+        <CurrentPollListContext.Provider value={value}>
             {children}
         </CurrentPollListContext.Provider>
     );

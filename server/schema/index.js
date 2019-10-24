@@ -165,6 +165,16 @@ const Mutation = new GraphQLObjectType({
             type: UserType,
             resolve: authenticationHandler(async (parent, args, context) => await context.user.remove())
         },
+        updateUser: {
+            type: UserType,
+            args: {
+                username: { type: GraphQLString }
+            },
+            resolve: authenticationHandler(async (parent, args, context) => {
+                await context.user.updateOne(args);
+                return await User.findById(context.user.id);
+            })
+        },
         createPoll: {
             type: PollType,
             args: {

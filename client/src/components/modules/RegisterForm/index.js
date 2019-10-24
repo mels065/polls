@@ -1,6 +1,5 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import _ from "lodash";
 import { useMutation } from "react-apollo";
 
 import Form from "../Form";
@@ -10,34 +9,23 @@ import { register } from "../../../graphql/mutations";
 import "./style.scss";
 
 function RegisterForm({ history }) {
-    const [error, setError] = React.useState(null);
     const [mutate] = useMutation(register);
 
-    function onSubmitCreator(formState) {
-        return async (event) => {
-            event.preventDefault();
-
-            try {
-                const { data } = await mutate({
-                    variables: formState.reduce((newVars, data) => (
-                        { ...newVars, [_.camelCase(data.label)]: data.value }
-                    ), {}),
-                });
-                const { register: {
-                    success,
-                    message,
-                    token,
-                } } = data;
-                if (!success) {
-                    setError(message);
-                } else {
-                    setError(null);
-                    window.localStorage.setItem("token", token);
-                    history.push("/");
-                }
-            } catch(err) {
-                setError(err.message);
+    function onSubmitCreatorCallback(data) {
+        try {
+            const { register: {
+                success,
+                message,
+                token,
+            } } = data;
+            if (!success) {
+                throw new Error(message);
+            } else {
+                window.localStorage.setItem("token", token);
+                history.push("/");
             }
+        } catch(err) {
+            throw err;
         }
     }
 
@@ -45,7 +33,6 @@ function RegisterForm({ history }) {
         <React.Fragment>
             <h2>Register</h2>
             <Form
-                error={error}
                 formShape={
                     [
                         { type: "email", label: "Email" },
@@ -54,8 +41,9 @@ function RegisterForm({ history }) {
                         { type: "password", label: "Repeat Password" }
                     ]
                 }
+                mutate={mutate}
                 submitButtonLabel="Register"
-                onSubmitCreator={onSubmitCreator}
+                onSubmitCreatorCallback={onSubmitCreatorCallback}
             />
         </React.Fragment>
     )
