@@ -1,11 +1,8 @@
 import React from "react";
-import { graphql } from "react-apollo";
+import { graphql, useQuery, useMutation } from "react-apollo";
 import * as compose from "lodash.flowright";
 
-import { getPolls } from "../../../graphql/queries";
 import { castVote, castUnvote } from "../../../graphql/mutations";
-
-import { CurrentUserContext } from "../../context/CurrentUser";
 
 import "./style.scss";
 
@@ -13,42 +10,41 @@ function AnswerListItem({
     pollId,
     answer: { label, votes },
     answerIndex,
-    castVote,
-    castUnvote
+    refetchQuery,
+    currentUserData,
 }) {
-    const currentUserContext = React.useContext(CurrentUserContext);
+    const [castVoteMutation] = useMutation(castVote);
+    const [castUnvoteMutation] = useMutation(castUnvote);
 
-    function castVote() {
-        if (votes.some(vote => vote.user.id === currentUserContext.user.id)) {
-            castUnvote({
-                variables: {
-                    pollId,
-                    answerIndex,
-                },
-                refetchQueries: [{ query: getPolls }] 
-            });
-        }
-        else {
-            castVote({
-                variables: {
-                    pollId,
-                    answerIndex,
-                },
-                refetchQueries: [{ query: getPolls }] 
-            });
+    function onClick() {
+        if (currentUserData.currentUser) {
+            if (votes.some(vote => currentUserData.currentUser.id === vote.user.id)) {
+                castUnvoteMutation({
+                    variables: {
+                        pollId,
+                        answerIndex
+                    },
+                    refetchQueries: [refetchQuery]
+                })
+            } else {
+                castVoteMutation({
+                    variables: {
+                        pollId,
+                        answerIndex
+                    },
+                    refetchQueries: [refetchQuery]
+                });
+            }
         }
     }
 
     return (
-        window.localStorage.getItem("token") || currentUserContext.userId ?
-            <button className="vote-button" onClick={castVote}>
+        window.localStorage.getItem("token") ?
+            <button className="vote-button" onClick={onClick}>
                 {label}
             </button> :
             <div>{label}</div>
     );
 }
 
-export default compose(
-    graphql(castVote, { name: "castVote" }),
-    graphql(castUnvote, { name: "castUnvote" }),
-)(AnswerListItem);
+export default AnswerListItem;

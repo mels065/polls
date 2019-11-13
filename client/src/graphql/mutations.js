@@ -59,7 +59,7 @@ export const createPoll = gql`
 `;
 
 export const deletePoll = gql`
-    mutation($pollId: ID) {
+    mutation($pollId: ID!) {
         deletePoll(pollId: $pollId) {
             id
             creator {
@@ -69,10 +69,6 @@ export const deletePoll = gql`
             question
             answers {
                 label
-                votes {
-                    id
-                    username
-                }
             }
         }
     }
@@ -81,6 +77,7 @@ export const deletePoll = gql`
 export const castVote = gql`
     mutation($pollId: ID!, $answerIndex: Int!) {
         castVote(pollId: $pollId, answerIndex: $answerIndex) {
+            id
             user {
                 id
                 username
@@ -96,6 +93,7 @@ export const castVote = gql`
 export const castUnvote = gql`
     mutation($pollId: ID!, $answerIndex: Int!) {
         castUnvote(pollId: $pollId, answerIndex: $answerIndex) {
+            id
             user {
                 id
                 username

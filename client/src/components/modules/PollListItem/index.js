@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 
 import AnswerListItem from "../AnswerListItem";
 
+import { getPolls } from "../../../graphql/queries";
+
 import "./style.scss";
 
 function PollListItem({ poll: {
@@ -25,6 +27,7 @@ function PollListItem({ poll: {
                         pollId={id}
                         answer={answer}
                         answerIndex={i}
+                        refetchQuery={{ query: getPolls }}
                     />
                 </li>
             ))}

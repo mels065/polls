@@ -5,7 +5,6 @@ import { useMutation, useQuery } from "react-apollo";
 import Loading from "../Loading";
 import Form from "../Form";
 
-import { CurrentUserContext } from "../../context/CurrentUser";
 import { FlashMessageContext } from "../../context/FlashMessage";
 
 import { getCurrentUser } from "../../../graphql/queries";

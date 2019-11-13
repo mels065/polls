@@ -82,6 +82,7 @@ const AnswerType = new GraphQLObjectType({
 const VoteType = new GraphQLObjectType({
     name: "Vote",
     fields: () => ({
+        id: { type: GraphQLID },
         user: {
             type: UserType,
             resolve(parent, args) {

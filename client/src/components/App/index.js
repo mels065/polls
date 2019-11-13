@@ -12,7 +12,8 @@ import FlashMessage from "../modules/FlashMessage";
 import HomePage from "../pages/Home";
 import RegisterPage from "../pages/Register";
 import LoginPage from "../pages/Login"
-import Profile from "../pages/Profile";
+import ProfilePage from "../pages/Profile";
+import PollPage from "../pages/Poll";
 import Logout from "../pages/Logout";
 
 function App() {
@@ -34,17 +35,10 @@ function App() {
             <Logout />
           </Route>
           <Route exact path="/profile">
-            <Profile />
+            <ProfilePage />
           </Route>
           <Route exact path="/poll/:id">
-            {(() => {
-              function Poll({ match }) {
-                return (
-                  <div>Poll {match.params.id}</div>
-                )
-              }
-              return withRouter(Poll);
-            })()}
+            <PollPage />
           </Route>
         </Switch>
       </Layout>
