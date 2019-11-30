@@ -31,7 +31,6 @@ function Poll() {
 
     async function onDeleteButtonClick() {
         try {
-            console.log(id);
             await deletePollMutation({
                 variables: { pollId: id }
             });

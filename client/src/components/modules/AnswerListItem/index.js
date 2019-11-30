@@ -16,9 +16,13 @@ function AnswerListItem({
     const [castVoteMutation] = useMutation(castVote);
     const [castUnvoteMutation] = useMutation(castUnvote);
 
+    function hasVotedForAnswer() {
+        return votes.some(vote => currentUserData.currentUser.id === vote.user.id)
+    }
+
     function onClick() {
-        if (currentUserData.currentUser) {
-            if (votes.some(vote => currentUserData.currentUser.id === vote.user.id)) {
+        if (currentUserData && currentUserData.currentUser) {
+            if (hasVotedForAnswer()) {
                 castUnvoteMutation({
                     variables: {
                         pollId,
@@ -40,7 +44,10 @@ function AnswerListItem({
 
     return (
         window.localStorage.getItem("token") ?
-            <button className="vote-button" onClick={onClick}>
+            <button 
+                className={`vote-button${hasVotedForAnswer() ? " voted" : ""}`}
+                onClick={onClick}
+            >
                 {label}
             </button> :
             <div>{label}</div>

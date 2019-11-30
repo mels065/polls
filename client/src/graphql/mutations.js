@@ -49,10 +49,6 @@ export const createPoll = gql`
             question
             answers {
                 label
-                votes {
-                    id
-                    username
-                }
             }
         }
     }

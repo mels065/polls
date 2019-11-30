@@ -10,7 +10,6 @@ import "./style.scss";
 function PollListItem({ poll: {
     id,
     question,
-    answers,
     creator
  } }) {
     return (
@@ -20,18 +19,6 @@ function PollListItem({ poll: {
                     {question}
                 </h2>
             </Link>
-            <ul className="poll-list-item-answers">
-                {answers.map((answer, i) => (
-                <li key={i}>
-                    <AnswerListItem
-                        pollId={id}
-                        answer={answer}
-                        answerIndex={i}
-                        refetchQuery={{ query: getPolls }}
-                    />
-                </li>
-            ))}
-            </ul>
             <div className="poll-list-item-creator">
                 created by <span className="creator-name">{creator.username}</span>
             </div>

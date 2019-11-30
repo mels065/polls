@@ -13,6 +13,7 @@ import HomePage from "../pages/Home";
 import RegisterPage from "../pages/Register";
 import LoginPage from "../pages/Login"
 import ProfilePage from "../pages/Profile";
+import CreatePollPage from "../pages/CreatePoll";
 import PollPage from "../pages/Poll";
 import Logout from "../pages/Logout";
 
@@ -36,6 +37,9 @@ function App() {
           </Route>
           <Route exact path="/profile">
             <ProfilePage />
+          </Route>
+          <Route exact path="/create-poll">
+            <CreatePollPage />
           </Route>
           <Route exact path="/poll/:id">
             <PollPage />

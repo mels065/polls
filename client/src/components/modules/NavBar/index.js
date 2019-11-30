@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { 
     faUser,
     faSignOutAlt,
     faSignInAlt,
     faUserPlus,
+    faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
 import MenuLink from "../MenuLink";
@@ -29,6 +31,9 @@ function NavBar() {
                         window.localStorage.getItem("token") || currentUserContext.userId ?
                             (
                                 <React.Fragment>
+                                    <li>
+                                        <MenuLink to="/create-poll" icon={faPlus} />
+                                    </li>
                                     <li>
                                         <MenuLink to="/profile" icon={faUser}>
                                             Profile
